@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="400" height="400" style="border:1px solid grey"></canvas>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/drilldown.js"></script>
+
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script>
+// Data preparation
+var seriesAsArray = [];
+var drillDownSeriesAsArray = [];
+
+var PLANTS = ["Plant1", "Plant2"]
+var PRODUCTS = [
+    ["Product 1A", "Product 1B", "Product 1C"],
+    ["Product 2A", "Product 2B", "Product 2C"]
+];
+var MONTHS = [1,2,3,4,5];
+
+for (var plant=0; plant < PLANTS.length; plant++){
+    var dataSetAsArray = [];
+    for (var month = 0;month<MONTHS.length;month++){
+        var plantProduction = 0;
+        var drillDownId = PLANTS[plant] + "_" + month;
+        var drillDownData = [];
+        for (var product = 0; product<PRODUCTS[plant].length;product++){
+            var productProduction = plant + product + month; // for illustration only..
+            plantProduction += productProduction;
+            drillDownData.push({
+                x: month,
+                y: productProduction,
+                name: PRODUCTS[plant][product] + " in month" + MONTHS[month]
+            });
+        }
+        dataSetAsArray.push(
+            {
+                x: month,
+                y: plantProduction,
+                drilldown: drillDownId
+            }
+        );
+
+        drillDownSeriesAsArray.push({
+            id: drillDownId,
+            type: 'pie',
+            name: PLANTS[plant],
+            data: drillDownData
+        })
+    }
+    seriesAsArray.push({
+        name: PLANTS[plant],
+        data: dataSetAsArray,
+        type: 'line'
+    });
+};
+
+
+
+// Create the chart
+Highcharts.chart('container', {
+    title: {
+        text: "My Chart"
+    },
+
+    chart: {
+        type: 'line'
+    },
+
+    tooltip: {
+        crosshairs: true,
+        shared: true
+    },
+
+    xAxis:{
+        title:{
+            text: "Month"
+        },
+        allowDecimals: false
+    },
+
+    yAxis: {
+        labels: {
+            align: 'right',
+            style: {
+                color: '#a0a0a0'
+            }
+        },
+        title: {
+            text: "Production [units / month]",
+            style: {
+                color: '#a0a0a0'
+            }
+        },
+        crosshair: true,
+        startOnTick: true,
+        min: 0
+    },
+
+    plotOptions: {
+        line: {
+            //animation: false
+            allowPointSelect: true
+        },
+        series: {
+            label: {
+                onArea: false
+            }
+        }
+    },
+
+    series: seriesAsArray,
+
+    drilldown: {
+        // allowPointDrilldown: false,
+        series: drillDownSeriesAsArray
+    }
+});
+
+
+
+
+
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+canvas.height = canvas.width;
+ctx.transform(1, 0, 0, -1, 0, canvas.height)
+
+const xArray = [50,60,70,80,90,100,110,120,130,140,150];
+const yArray = [7,8,8,9,9,9,10,11,14,14,15];
+
+ctx.fillStyle = "red";
+for (let i = 0; i < xArray.length-1; i++) {
+  let x = xArray[i]*400/150;
+  let y = yArray[i]*400/15;
+  ctx.beginPath();
+  ctx.ellipse(x, y, 3, 3, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+</script>
+
+</body>
+</html>
